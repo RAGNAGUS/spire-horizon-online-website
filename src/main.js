@@ -1,15 +1,16 @@
 import "./assets/main.css";
 
 import { createApp } from "vue";
-import { createPinia } from "pinia";
 
 import App from "./App.vue";
-import router from "./router";
+import reveal from "./directives/reveal";
 
-const app = createApp(App);
+// The old site had separate pages; their addresses now jump to the matching section.
+const OLD_PAGES = { "/classes": "#classes", "/cards": "#creatures", "/roadmap": "#journey", "/copyright": "#community" };
+const target = OLD_PAGES[location.pathname.replace(/\/$/, "")];
+if (target) history.replaceState(null, "", `/${target}`);
+else if (location.pathname !== "/" && !location.pathname.startsWith("/media/")) history.replaceState(null, "", "/" + location.hash);
 
-app.use(createPinia());
-app.use(router);
+createApp(App).directive("reveal", reveal).mount("#app");
 
-app.mount("#app");
-
+if (location.hash) requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView());
